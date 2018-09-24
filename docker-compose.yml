@@ -1,0 +1,42 @@
+version: '3'
+networks:
+  demonet:
+    external:
+      name: $TF_VAR_demo_net
+      
+services:
+  conjur_pg:
+    image: postgres:9.6 
+    networks:
+      - demonet
+   
+  conjur:
+    image: cyberark/conjur
+    command: server
+    environment:
+      DATABASE_URL: postgres://postgres@conjur_pg/postgres
+      CONJUR_DATA_KEY:
+    ports:
+      - "8080:80"
+    networks:
+      - demonet
+      
+  cli:
+    image: cyberark/conjur-cli:5
+    environment:
+      CONJUR_ACCOUNT: ${CONJUR_ACCOUNT-cucumber}
+      CONJUR_APPLIANCE_URL:        
+      CONJUR_AUTHN_LOGIN:
+      CONJUR_AUTHN_API_KEY:
+    networks:
+      - demonet
+    volumes:
+      - .:/src
+
+  app_psql:
+    image: postgres:9.6
+    entrypoint : psql
+    environment:
+      PGHOST: app_pg
+    networks:
+      - demonet

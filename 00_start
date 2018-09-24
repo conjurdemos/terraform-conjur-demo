@@ -1,0 +1,31 @@
+#!/bin/bash -e
+
+# Fetch the Conjur Terraform provider, get ready to use it.
+make -f etc/Makefile
+terraform init
+
+
+. ./lib/conjur.sh
+
+if [[ -z "$(docker network ls -q --filter name=${TF_VAR_demo_net})" ]]; then
+  docker network create $TF_VAR_demo_net
+fi
+
+
+docker-compose up -d conjur_pg
+while ! docker-compose exec conjur_pg pg_isready; do
+  sleep 1
+done
+
+data_key="$(docker-compose run -T --rm --no-deps conjur data-key generate)"
+CONJUR_DATA_KEY=$data_key docker-compose up -d conjur
+docker-compose exec conjur conjurctl account create ${account}
+
+login_to_conjur
+
+conjur_cli policy load root policy/policy.yml
+conjur_cli variable values add tf-demo/db-password $(openssl rand -hex 32)
+
+conjur_cli variable values add tf-demo/app-password $(openssl rand -hex 32)
+conjur_cli variable values add tf-demo/url app_pg:5432/tf_demo_production
+conjur_cli variable values add tf-demo/username tf_demo

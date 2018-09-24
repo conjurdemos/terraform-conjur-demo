@@ -1,0 +1,10 @@
+#!/bin/bash -e
+
+. ./lib/conjur.sh
+. ./lib/app.sh
+
+login_to_conjur
+
+build_app
+
+deploy_app

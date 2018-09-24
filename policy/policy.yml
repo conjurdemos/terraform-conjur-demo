@@ -1,0 +1,7 @@
+- !policy
+  id: tf-demo
+  body:
+    - !variable db-password
+    - !variable app-password        
+    - !variable url
+    - !variable username

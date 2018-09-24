@@ -1,0 +1,12 @@
+#!/bin/bash -e
+
+. ./lib/conjur.sh
+
+read -p 'Destroy Conjur server? Type "yes" to confirm, anything else to abort: ' -r
+if [[ $REPLY != "yes" ]]; then
+  echo 'Aborted.'
+  exit 1
+fi
+
+docker-compose down
+docker network remove $TF_VAR_demo_net

@@ -1,0 +1,10 @@
+# Let Conjur manage the value of the app's password
+- !policy
+  id: tf-demo
+  body:
+    - !variable 
+      id: app-password
+      annotations:
+        rotation/rotator: postgresql/password
+        rotation/ttl: P1Y
+        rotation/postgresql/password/length: 32

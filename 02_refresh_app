@@ -1,0 +1,14 @@
+#!/bin/bash -e
+
+. ./lib/conjur.sh
+. ./lib/app.sh
+
+login_to_conjur
+
+build_app
+
+terraform taint docker_container.app
+
+deploy_app
+
+rotate_password

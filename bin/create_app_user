@@ -1,0 +1,11 @@
+#!/bin/bash -e
+
+cid=$1; shift
+user=$1; shift
+passwd=$1; shift
+
+docker exec -i $cid bash -ex <<EOF
+  export PGUSER=postgres
+  while ! createuser -d $user; do sleep 1; done
+  while ! psql -c "ALTER ROLE $user PASSWORD '$passwd'"; do sleep 1; done
+EOF
